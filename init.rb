@@ -1,0 +1,1 @@
+require 'sharded_master'

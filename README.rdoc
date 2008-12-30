@@ -1,0 +1,54 @@
+= sharded_database
+
+== Overview
+
+This ActiveRecord plugin is the end result of a real world problem - First, how to aggregate table data from across multiple databases for the purpose of pagination / searching. Second, how to transparently have one production instance have read/write access to a set of aggregated records pulled from a global view.
+
+The first step was solved by creating a SQL view to pool all production records together for a given databse. This SQL view resides on a central database accessible by all instances of our application. From there, we query against this view to return a set of Aggregate* records. The second step, which this plugin handles, is proxying to the original database/record for the 'aggregate' instance and transparently interacting with the returned aggregate record as if it were the original object.
+
+
+== Uses
+
+Currently, sharded_database works by reflecting on a set of returned records, and taking the result of #determine_connection to delegate the connection to - for each instance. The path we chose had us creating a view that would return aggregate records, with an added 'source' column specifying the originating database. We then rigged our #determine_connection to return an abstract connection model depending on the value. Other ideas for implementation include an after_create callback that writes the source database / ID to a centralized table.
+
+
+== Example and Usage
+
+=== Setup
+
+Setup your Aggregate model, inheriting from a class that establishes a connection to your global datastore.
+
+  class AggregateFoo < ActiveRecord::Base
+    include ShardedDatabase::Aggregate
+
+    def determine_connection
+      Connections[source.to_sym]
+    end
+  end
+  
+The #determine_connection class above expects that there is a Connections constant that is a hash of key/value pairs of 'source' symbols and abstract models that connect to various databases. This method can be implemented in any way you desire to determine the connection source.
+
+
+=== Loading Aggregate Records
+
+Assuming that AggregateFoo is a model that is bound to your aggregate view/table, you can now #find against this model as you would any other ActiveRecord class.
+
+  AggregateFoo.all   # => [#<Foo(Connection::One) ..>, #<Foo(Connection::Two) ..>, #<Foo(Connection::One) ..>]
+  
+Updating an attribute on the first record in the above array would update the corresponding record located in the database that Connection::One connects to.
+
+
+=== Associations
+
+Associations are also taken into account, and any associations that are defined on a Foo model will be sourced correctly. I have only tested this one level deep, though.
+
+
+=== Accessing 'raw' AggregateFoo objects
+
+Easily done. Simply add a :raw option set to true to your finder queries.
+
+  AggreateFoo.all(:raw => true)
+
+
+
+Copyright &copy; 2008, Brennan Dunn, Decisiv Inc. Released under the MIT license.

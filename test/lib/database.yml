@@ -1,0 +1,20 @@
+master:
+  adapter: mysql
+  database: database_master
+  username: root
+  password: 
+  host: localhost
+
+one_db:
+  adapter: mysql
+  database: database_mck
+  username: root
+  password: 
+  host: localhost
+  
+two_db:
+  adapter: mysql
+  database: database_vlv
+  username: root
+  password: 
+  host: localhost
