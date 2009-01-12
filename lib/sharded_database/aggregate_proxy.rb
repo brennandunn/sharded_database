@@ -14,7 +14,7 @@ module ShardedDatabase
 
     def load_target
       @target ||= begin
-                    klass = (self.proxy_class.source_class.constantize || self.proxy_class.name.gsub('Aggregate','')).constantize
+                    klass = (self.proxy_class.source_class || self.proxy_class.name.gsub('Aggregate','')).constantize
                     borrow_connection(klass, @klass) { |k| k.find(@foreign_id) }
                   end
     end
