@@ -7,8 +7,9 @@ module ShardedDatabase
       klass.extend         ClassMethods
       klass.send :include, InstanceMethods
       klass.class_eval do
-        cattr_accessor :connection_field, :source_class
+        cattr_accessor :connection_field, :source_class, :foreign_id
         @connection_field = :oem
+        @foreign_id = :foreign_id
 
         class << self
           alias_method_chain :find, :raw
@@ -34,7 +35,7 @@ module ShardedDatabase
       def after_find
         @klass      = determine_connection || raise(ShardedDatabase::NoConnectionError, 'Cannot determine connection class')
         @connection = @klass.respond_to?(:connection) ? @klass.connection : raise(ShardedDatabase::NoConnectionError, 'Connection class does not respond to :connection')
-        @foreign_id = foreign_id
+        @foreign_id = self[self.class.foreign_id.to_sym]
 
         metaclass.delegate :connection, :to => @klass
 
