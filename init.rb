@@ -1,1 +1,1 @@
-require 'sharded_master'
+require 'sharded_database'
