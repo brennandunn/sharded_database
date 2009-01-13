@@ -30,6 +30,10 @@ class InstanceTest < ShardedDatabase::TestCase
       assert_same_elements @estimate.attributes.keys, Estimate.column_names
     end
     
+    should 'preserve attributes supplied to #preserve_attributes' do
+      assert_equal 'one', @estimate.proxy_source
+    end
+    
   end
   
 end

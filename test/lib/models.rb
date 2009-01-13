@@ -19,6 +19,8 @@ end
 
 class AggregateEstimate < GlobalConnection
   include ShardedDatabase::Aggregate
+  self.foreign_id   = :other_id
+  preserve_attributes :source
   
   def determine_connection
     Connections[source.to_sym]

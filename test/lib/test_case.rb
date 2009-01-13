@@ -27,7 +27,7 @@ module ShardedDatabase
         silence do
           connection.create_table :aggregate_estimates, :force => true do |t|
             t.string    :source
-            t.integer   :foreign_id
+            t.integer   :other_id
             t.timestamp :created_at
           end
         end
@@ -62,10 +62,10 @@ module ShardedDatabase
       
       one_item = Class.new(Connection::One) { set_table_name 'items' ; belongs_to(:estimate) }
       one_item.create :name => 'One Test Item', :estimate_id => @one_1.id
-      
-      AggregateEstimate.create :source => 'one', :foreign_id => @one_1.id
-      AggregateEstimate.create :source => 'two', :foreign_id => @two_1.id
-      AggregateEstimate.create :source => 'two', :foreign_id => @two_2.id
+            
+      AggregateEstimate.create :source => 'one', :other_id => @one_1.id
+      AggregateEstimate.create :source => 'two', :other_id => @two_1.id
+      AggregateEstimate.create :source => 'two', :other_id => @two_2.id
     end
     
   end

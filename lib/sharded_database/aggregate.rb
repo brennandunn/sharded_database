@@ -9,7 +9,7 @@ module ShardedDatabase
       klass.class_eval do
         cattr_accessor :connection_field, :source_class, :foreign_id
         @connection_field = :oem
-        @foreign_id = :foreign_id
+        @foreign_id = :other_id
 
         class << self
           alias_method_chain :find, :raw
@@ -22,6 +22,10 @@ module ShardedDatabase
       def find_with_raw(*args)
         @raw = args.last.is_a?(Hash) && args.last.delete(:raw)
         @raw ? temporarily_remove(:after_find) { find_without_raw(*args) } : find_without_raw(*args)
+      end
+
+      def preserve_attributes(*attrs)
+        @preserved_attributes = attrs.map(&:to_s)
       end
 
     end
@@ -39,12 +43,16 @@ module ShardedDatabase
 
         metaclass.delegate :connection, :to => @klass
 
+        (self.class.instance_variable_get("@preserved_attributes") || []).each do |attr|
+          metaclass.send :alias_method, "proxy_#{attr}", attr
+        end
+
         class << self
           alias_method :proxy_class, :class
 
           include AggregateProxy
           instance_methods.each do |m|
-            undef_method(m) unless m =~ /^__|proxy_|inspect|foreign_id/
+            undef_method(m) unless m =~ /^__|proxy_|inspect/
           end
         end
         
