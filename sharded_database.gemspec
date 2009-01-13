@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name     = "sharded_database"
-  s.version  = "0.1.2"
-  s.date     = "2009-01-11"
+  s.version  = "0.1.3"
+  s.date     = "2009-01-12"
   s.summary  = "Allows for connection handling at the instance level."
   s.email    = "me@brennandunn.com"
   s.homepage = "http://github.com/brennandunn/sharded_database/"
