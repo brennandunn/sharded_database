@@ -53,10 +53,10 @@ module ShardedDatabase
             
             @original_connection = klass.connection
             klass.metaclass.delegate :connection, :to => self.source_class
-            value = klass.find(send(reflection.primary_key_name))
+            @#{method} ||= klass.find(send(reflection.primary_key_name))
             klass.metaclass.delegate :connection, :to => @original_connection
             
-            value
+            @#{method}
           end
         end
       }, __FILE__, __LINE__
