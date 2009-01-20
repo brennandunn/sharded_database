@@ -41,6 +41,8 @@ module ShardedDatabase
       load_target.source_class = @klass
       load_target.class_eval %{
         def #{method}(*args)
+          return @#{method} if @#{method}
+          
           if proxy_#{method}.respond_to?(:proxy_reflection)
             proxy_#{method}.proxy_reflection.klass.metaclass.delegate :connection, :to => self.source_class
             proxy_#{method}
@@ -49,13 +51,9 @@ module ShardedDatabase
             # Revisit this later and do it properly.
             
             reflection = self.class.reflect_on_all_associations.find { |a| a.name == :#{method} }
-            klass = reflection.klass
-            
-            @original_connection = klass.connection
+            klass = reflection.klass            
             klass.metaclass.delegate :connection, :to => self.source_class
-            @#{method} ||= klass.find(send(reflection.primary_key_name))
-            klass.metaclass.delegate :connection, :to => @original_connection
-            
+            @#{method} ||= klass.find(send(reflection.primary_key_name))            
             @#{method}
           end
         end

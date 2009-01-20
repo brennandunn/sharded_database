@@ -26,6 +26,10 @@ class AssociationTest < ShardedDatabase::TestCase
       assert_instance_of Company, @parent.company
     end
     
+    should 'cache the associated object' do
+      assert_equal @parent.company.object_id, @parent.company.object_id
+    end
+    
   end
   
 end
