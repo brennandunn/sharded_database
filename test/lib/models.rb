@@ -18,6 +18,7 @@ class GlobalConnection < ActiveRecord::Base
 end
 
 class AggregateEstimate < GlobalConnection
+  belongs_to :gun
   include ShardedDatabase::Aggregate
   self.foreign_id   = :other_id
   preserve_attributes :source
@@ -28,7 +29,12 @@ class AggregateEstimate < GlobalConnection
   
 end
 
-class Estimate < ActiveRecord::Base  
+class Company < ActiveRecord::Base
+  has_many :items
+end
+
+class Estimate < ActiveRecord::Base
+  belongs_to :company
   has_many :items
 end
 

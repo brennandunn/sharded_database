@@ -39,6 +39,7 @@ module ShardedDatabase
         ::ActiveRecord::Base.class_eval do
           silence do
             connection.create_table :estimates, :force => true do |t|
+              t.belongs_to  :company
               t.string      :name
             end
             
@@ -46,6 +47,11 @@ module ShardedDatabase
               t.belongs_to  :estimate
               t.string      :name
             end
+            
+            connection.create_table :companies, :force => true do |t|
+              t.string      :name
+            end
+            
           end
         end
       end
@@ -53,8 +59,11 @@ module ShardedDatabase
     end
     
     def setup_models
-      one_estimate = Class.new(Connection::One) { set_table_name 'estimates' ; has_many(:items) }
-      @one_1 = one_estimate.create :name => 'One Estimate'
+      one_company = Class.new(Connection::One) { set_table_name 'companies' }
+      @company_1 = one_company.create :name => 'One Company'
+      
+      one_estimate = Class.new(Connection::One) { set_table_name 'estimates' ; has_many(:items) ; belongs_to(:company) }
+      @one_1 = one_estimate.create :name => 'One Estimate', :company_id => @company_1.id
       
       two_estimate = Class.new(Connection::Two) { set_table_name 'estimates' ; has_many(:items) }
       @two_1 = two_estimate.create :name => 'One Estimate 1'
