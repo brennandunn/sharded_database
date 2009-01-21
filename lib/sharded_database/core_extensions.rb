@@ -1,6 +1,6 @@
 class Object
   
-  def temporarily_remove(method, &block)
+  def temporarily_undef_method(method, &block)
     alias_method "original_#{method}", method
     undef_method(method)
     return yield
