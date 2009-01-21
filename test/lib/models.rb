@@ -17,7 +17,7 @@ class GlobalConnection < ActiveRecord::Base
   self.abstract_class = true
 end
 
-class AggregateEstimate < GlobalConnection
+class AggregateEmployee < GlobalConnection
   belongs_to :gun
   include ShardedDatabase::Aggregate
   self.foreign_id   = :other_id
@@ -33,7 +33,7 @@ class Company < ActiveRecord::Base
   has_many :items
 end
 
-class Estimate < ActiveRecord::Base
+class Employee < ActiveRecord::Base
   belongs_to :company
   has_many :items
   
@@ -44,5 +44,5 @@ class Estimate < ActiveRecord::Base
 end
 
 class Item < ActiveRecord::Base
-  belongs_to :estimate
+  belongs_to :employee
 end
