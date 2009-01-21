@@ -7,8 +7,7 @@ module ShardedDatabase
       klass.extend         ClassMethods
       klass.send :include, InstanceMethods
       klass.class_eval do
-        cattr_accessor :connection_field, :source_class, :foreign_id
-        @connection_field = :oem
+        cattr_accessor :source_class, :foreign_id
         @foreign_id = :other_id
 
         class << self
