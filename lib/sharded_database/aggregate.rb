@@ -7,23 +7,26 @@ module ShardedDatabase
       klass.extend         ClassMethods
       klass.send :include, InstanceMethods
       klass.class_eval do
-        cattr_accessor :connection_field, :source_class, :foreign_id
-        @connection_field = :oem
+        cattr_accessor :source_class, :foreign_id
         @foreign_id = :other_id
 
         class << self
-          alias_method_chain :find, :raw
+          alias_method_chain :find, :aggregate_proxy
         end
       end
     end
 
     module ClassMethods
 
-      def find_with_raw(*args)
-        @raw = args.last.is_a?(Hash) && args.last.delete(:raw)
-        @raw ? temporarily_undef_method(:after_find) { find_without_raw(*args) } : find_without_raw(*args)
+      def find_with_aggregate_proxy(*args)
+        without_aggregate_proxy = args.last.is_a?(Hash) && args.last.delete(:aggregate_proxy).is_a?(FalseClass)
+        if without_aggregate_proxy
+          temporarily_undef_method(:after_find) { find_without_aggregate_proxy(*args) }
+        else
+          find_without_aggregate_proxy(*args)
+        end
       end
-
+      
       def preserve_attributes(*attrs)
         @preserved_attributes = attrs.map(&:to_s)
       end
@@ -32,12 +35,13 @@ module ShardedDatabase
 
     module InstanceMethods
       
-      def determine_connection
-        # stub method - implement your own!
+      def sharded_connection_klass
+        raise NotImplementedError,
+          "You must implement your own #sharded_connection_klass method that returns an ActiveRecord::Base subclass which yeilds a connection."
       end
       
       def after_find
-        @klass      = determine_connection || raise(ShardedDatabase::NoConnectionError, 'Cannot determine connection class')
+        @klass      = sharded_connection_klass
         @connection = @klass.respond_to?(:connection) ? @klass.connection : raise(ShardedDatabase::NoConnectionError, 'Connection class does not respond to :connection')
         @foreign_id = self[self.class.foreign_id.to_sym]
 

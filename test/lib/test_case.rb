@@ -21,11 +21,11 @@ module ShardedDatabase
         SQLite3::Database.new(file)
       end
       
-      # setup aggregate table
+      # Setup master table
       ::ActiveRecord::Base.establish_connection :master
       ::ActiveRecord::Base.class_eval do
         silence do
-          connection.create_table :aggregate_estimates, :force => true do |t|
+          connection.create_table :aggregate_employees, :force => true do |t|
             t.string    :source
             t.integer   :other_id
             t.timestamp :created_at
@@ -33,18 +33,18 @@ module ShardedDatabase
         end
       end
       
-      # setup NUM_db.estimates
+      # Setup sharded DBs for employees
       %w(one two).each do |num|
-        ::ActiveRecord::Base.establish_connection "#{num}_db".to_sym
+        ::ActiveRecord::Base.establish_connection "shard_#{num}".to_sym
         ::ActiveRecord::Base.class_eval do
           silence do
-            connection.create_table :estimates, :force => true do |t|
+            connection.create_table :employees, :force => true do |t|
               t.belongs_to  :company
               t.string      :name
             end
             
             connection.create_table :items, :force => true do |t|
-              t.belongs_to  :estimate
+              t.belongs_to  :employee
               t.string      :name
             end
             
@@ -62,19 +62,19 @@ module ShardedDatabase
       one_company = Class.new(Connection::One) { set_table_name 'companies' }
       @company_1 = one_company.create :name => 'One Company'
       
-      one_estimate = Class.new(Connection::One) { set_table_name 'estimates' ; has_many(:items) ; belongs_to(:company) }
-      @one_1 = one_estimate.create :name => 'One Estimate', :company_id => @company_1.id
+      one_employee = Class.new(Connection::One) { set_table_name 'employees' ; has_many(:items) ; belongs_to(:company) }
+      @one_1 = one_employee.create :name => 'One Employee', :company_id => @company_1.id
       
-      two_estimate = Class.new(Connection::Two) { set_table_name 'estimates' ; has_many(:items) }
-      @two_1 = two_estimate.create :name => 'One Estimate 1'
-      @two_2 = two_estimate.create :name => 'Two Estimate 2'
+      two_employee = Class.new(Connection::Two) { set_table_name 'employees' ; has_many(:items) }
+      @two_1 = two_employee.create :name => 'One Employee 1'
+      @two_2 = two_employee.create :name => 'Two Employee 2'
       
-      one_item = Class.new(Connection::One) { set_table_name 'items' ; belongs_to(:estimate) }
-      one_item.create :name => 'One Test Item', :estimate_id => @one_1.id
+      one_item = Class.new(Connection::One) { set_table_name 'items' ; belongs_to(:employee) }
+      one_item.create :name => 'One Test Item', :employee_id => @one_1.id
             
-      AggregateEstimate.create :source => 'one', :other_id => @one_1.id
-      AggregateEstimate.create :source => 'two', :other_id => @two_1.id
-      AggregateEstimate.create :source => 'two', :other_id => @two_2.id
+      AggregateEmployee.create :source => 'one', :other_id => @one_1.id
+      AggregateEmployee.create :source => 'two', :other_id => @two_1.id
+      AggregateEmployee.create :source => 'two', :other_id => @two_2.id
     end
     
   end
