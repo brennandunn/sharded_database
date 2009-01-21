@@ -1,20 +1,20 @@
 master:
   adapter: mysql
-  database: database_master
+  database: sharded_database_master
   username: root
   password: 
   host: localhost
 
 one_db:
   adapter: mysql
-  database: database_mck
+  database: sharded_database_one
   username: root
   password: 
   host: localhost
   
 two_db:
   adapter: mysql
-  database: database_vlv
+  database: sharded_database_two
   username: root
   password: 
   host: localhost
