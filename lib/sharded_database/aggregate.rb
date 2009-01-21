@@ -59,6 +59,29 @@ module ShardedDatabase
         self.class.reflect_on_all_associations.each do |a| 
           metaclass.send :alias_method, "proxy_#{a.name}".to_sym, a.name.to_sym
           metaclass.send :undef_method, a.name
+          
+          load_target.metaclass.send(:attr_accessor, :source_class)
+          load_target.source_class = @klass
+          method = a.name
+          load_target.class_eval %{
+            def #{method}(*args)
+              return @#{method} if @#{method}
+          
+              if proxy_#{method}.respond_to?(:proxy_reflection)
+                proxy_#{method}.proxy_reflection.klass.metaclass.delegate :connection, :to => self.source_class
+                proxy_#{method}
+              else
+                # Hacked implementation of belongs_to to superficially simulate an association proxy
+                # Revisit this later and do it properly.
+          
+                reflection = self.class.reflect_on_all_associations.find { |a| a.name == :#{method} }
+                klass = reflection.klass            
+                klass.metaclass.delegate :connection, :to => self.source_class
+                @#{method} ||= klass.find(send(reflection.primary_key_name))            
+                @#{method}
+              end
+            end
+          }, __FILE__, __LINE__
         end
         
       end

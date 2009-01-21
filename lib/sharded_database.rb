@@ -4,6 +4,6 @@ require 'sharded_database/core_extensions'
 
 module ShardedDatabase
   
-  VERSION = '0.1.4.2'
+  VERSION = '0.1.5'
   
 end
