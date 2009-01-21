@@ -55,7 +55,7 @@ module ShardedDatabase
             undef_method(m) unless m =~ /^__|proxy_|inspect/
           end
         end
-        
+
         self.class.reflect_on_all_associations.each do |a| 
           metaclass.send :alias_method, "proxy_#{a.name}".to_sym, a.name.to_sym
           metaclass.send :undef_method, a.name

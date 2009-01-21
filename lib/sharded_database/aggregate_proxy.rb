@@ -1,6 +1,6 @@
 module ShardedDatabase
   module AggregateProxy
-    
+
     def ===(other)
       other === load_target
     end

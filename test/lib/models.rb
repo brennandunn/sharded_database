@@ -36,6 +36,11 @@ end
 class Estimate < ActiveRecord::Base
   belongs_to :company
   has_many :items
+  
+  def call_company
+    company
+  end
+  
 end
 
 class Item < ActiveRecord::Base

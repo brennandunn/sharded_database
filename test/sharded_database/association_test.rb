@@ -30,6 +30,10 @@ class AssociationTest < ShardedDatabase::TestCase
       assert_equal @parent.company.object_id, @parent.company.object_id
     end
     
+    should 'allow instance methods to the proxied object to access associations' do
+      assert_equal @parent.company, @parent.call_company
+    end
+    
   end
   
 end
