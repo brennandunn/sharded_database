@@ -35,7 +35,7 @@ module ShardedDatabase
       
       # setup NUM_db.estimates
       %w(one two).each do |num|
-        ::ActiveRecord::Base.establish_connection "#{num}_db".to_sym
+        ::ActiveRecord::Base.establish_connection "shard_#{num}".to_sym
         ::ActiveRecord::Base.class_eval do
           silence do
             connection.create_table :estimates, :force => true do |t|

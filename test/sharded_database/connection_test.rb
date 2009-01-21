@@ -11,7 +11,7 @@ class ConnectionTest < ShardedDatabase::TestCase
   should 'have instances of the same source share the same connection' do
     first, second = AggregateEstimate.find_all_by_source('two', :limit => 2)
     
-    assert_connection :two_db, first, second
+    assert_connection :shard_two, first, second
     assert_equal first.connection.object_id, second.connection.object_id  # ensure that delegation is working correctly
   end
   

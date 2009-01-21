@@ -11,7 +11,7 @@ class AssociationTest < ShardedDatabase::TestCase
     
     should 'fetch items from the parent instance connection' do
       assert ! @parent.items.empty?
-      assert_connection :one_db, @parent.items.first
+      assert_connection :shard_one, @parent.items.first
     end
     
     should 'keep its connection when bubbling up to an associations parent' do

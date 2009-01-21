@@ -5,16 +5,17 @@ master:
   password: 
   host: localhost
 
-one_db:
+shard_one:
   adapter: mysql
   database: sharded_database_one
   username: root
   password: 
   host: localhost
   
-two_db:
+shard_two:
   adapter: mysql
   database: sharded_database_two
   username: root
   password: 
   host: localhost
+

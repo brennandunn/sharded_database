@@ -1,12 +1,12 @@
 module Connection ; end
 
 class Connection::One < ActiveRecord::Base
-  establish_connection :one_db
+  establish_connection :shard_one
   self.abstract_class = true
 end
 
 class Connection::Two < ActiveRecord::Base
-  establish_connection :two_db
+  establish_connection :shard_two
   self.abstract_class = true
 end
 
