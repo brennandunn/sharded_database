@@ -21,7 +21,7 @@ module ShardedDatabase
 
       def find_with_raw(*args)
         @raw = args.last.is_a?(Hash) && args.last.delete(:raw)
-        @raw ? temporarily_remove(:after_find) { find_without_raw(*args) } : find_without_raw(*args)
+        @raw ? temporarily_undef_method(:after_find) { find_without_raw(*args) } : find_without_raw(*args)
       end
 
       def preserve_attributes(*attrs)
