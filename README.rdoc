@@ -43,11 +43,13 @@ Updating an attribute on the first record in the above array would update the co
 Associations are also taken into account, and any associations that are defined on a Foo model will be sourced correctly. I have only tested this one level deep, though.
 
 
-=== Accessing 'raw' AggregateFoo objects
+=== Accessing Non-Proxyable AggregateFoo Objects
 
-Easily done. Simply add a :raw option set to true to your finder queries.
+Easily done. Simply add a :aggregate_proxy option set to false to your finders.
 
-  AggreateFoo.all(:raw => true)
+  AggreateFoo.all(:aggregate_proxy => false)
+
+
 
 
 

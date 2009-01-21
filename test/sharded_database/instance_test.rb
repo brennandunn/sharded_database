@@ -4,10 +4,10 @@ class InstanceTest < ShardedDatabase::TestCase
   def setup ; setup_environment ; end
   
   
-  context 'Loading raw aggregate objects' do
+  context 'Loading non-proxyable aggregate objects' do
     
     setup do
-      @aggregates = AggregateEstimate.all(:raw => true)
+      @aggregates = AggregateEstimate.all(:aggregate_proxy => false)
     end
     
     should 'all be AggregateEstimate instances' do

@@ -11,18 +11,22 @@ module ShardedDatabase
         @foreign_id = :other_id
 
         class << self
-          alias_method_chain :find, :raw
+          alias_method_chain :find, :aggregate_proxy
         end
       end
     end
 
     module ClassMethods
 
-      def find_with_raw(*args)
-        @raw = args.last.is_a?(Hash) && args.last.delete(:raw)
-        @raw ? temporarily_undef_method(:after_find) { find_without_raw(*args) } : find_without_raw(*args)
+      def find_with_aggregate_proxy(*args)
+        without_aggregate_proxy = args.last.is_a?(Hash) && args.last.delete(:aggregate_proxy).is_a?(FalseClass)
+        if without_aggregate_proxy
+          temporarily_undef_method(:after_find) { find_without_aggregate_proxy(*args) }
+        else
+          find_without_aggregate_proxy(*args)
+        end
       end
-
+      
       def preserve_attributes(*attrs)
         @preserved_attributes = attrs.map(&:to_s)
       end
