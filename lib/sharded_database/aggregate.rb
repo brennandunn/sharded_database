@@ -35,12 +35,13 @@ module ShardedDatabase
 
     module InstanceMethods
       
-      def determine_connection
-        # stub method - implement your own!
+      def sharded_connection_klass
+        raise NotImplementedError,
+          "You must implement your own #sharded_connection_klass method that returns an ActiveRecord::Base subclass which yeilds a connection."
       end
       
       def after_find
-        @klass      = determine_connection || raise(ShardedDatabase::NoConnectionError, 'Cannot determine connection class')
+        @klass      = sharded_connection_klass
         @connection = @klass.respond_to?(:connection) ? @klass.connection : raise(ShardedDatabase::NoConnectionError, 'Connection class does not respond to :connection')
         @foreign_id = self[self.class.foreign_id.to_sym]
 

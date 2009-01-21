@@ -10,8 +10,6 @@ class Connection::Two < ActiveRecord::Base
   self.abstract_class = true
 end
 
-Connections = { :one => Connection::One, :two => Connection::Two }
-
 class GlobalConnection < ActiveRecord::Base
   establish_connection :master
   self.abstract_class = true
@@ -23,8 +21,8 @@ class AggregateEmployee < GlobalConnection
   self.foreign_id   = :other_id
   preserve_attributes :source
   
-  def determine_connection
-    Connections[source.to_sym]
+  def sharded_connection_klass
+    "Connection::#{source.classify}".constantize
   end
   
 end

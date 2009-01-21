@@ -9,7 +9,7 @@ The first step was solved by creating a SQL view to pool all production records 
 
 == Uses
 
-Currently, sharded_database works by reflecting on a set of returned records, and taking the result of #determine_connection to delegate the connection to - for each instance. The path we chose had us creating a view that would return aggregate records, with an added 'source' column specifying the originating database. We then rigged our #determine_connection to return an abstract connection model depending on the value. Other ideas for implementation include an after_create callback that writes the source database / ID to a centralized table.
+Currently, sharded_database works by reflecting on a set of returned records, and taking the result of #sharded_connection_klass method to delegate the connection to - for each instance. The path we chose had us creating a view that would return aggregate records, with an added 'source' column specifying the originating database. We then rigged our #sharded_connection_klass to return an abstract connection model depending on the value. Other ideas for implementation include an after_create callback that writes the source database / ID to a centralized table.
 
 
 == Example and Usage
@@ -21,12 +21,12 @@ Setup your Aggregate model, inheriting from a class that establishes a connectio
   class AggregateFoo < ActiveRecord::Base
     include ShardedDatabase::Aggregate
 
-    def determine_connection
-      Connections[source.to_sym]
+    def sharded_connection_klass
+      "Connection::#{source.classify}".constantize
     end
   end
   
-The #determine_connection class above expects that there is a Connections constant that is a hash of key/value pairs of 'source' symbols and abstract models that connect to various databases. This method can be implemented in any way you desire to determine the connection source.
+The constant returned by #sharded_connection_klass is expected to be an subclass of ActiveRecord::Base and respond to #connection. It is suggested that you use the preserve_attributes class method in the aggregate class and use that attribute to augment and/or find the constant somehow.
 
 
 === Loading Aggregate Records
