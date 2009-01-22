@@ -31,7 +31,7 @@ class InstanceTest < ShardedDatabase::TestCase
     end
     
     should 'preserve attributes supplied to #preserve_attributes' do
-      assert_equal 'one', @employee.proxy_source
+      assert_equal 'one', @employee.original_source
     end
     
     should 'have #respond_to? proxy to the instance' do

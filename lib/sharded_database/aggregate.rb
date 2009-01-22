@@ -58,7 +58,7 @@ module ShardedDatabase
       
       def preserve_attributes
         (self.class.instance_variable_get("@preserved_attributes") || []).each do |attr|
-          metaclass.send :alias_method, "proxy_#{attr}", attr
+          metaclass.send :alias_method, "original_#{attr}", attr
         end
       end
       
@@ -68,7 +68,7 @@ module ShardedDatabase
 
           include AggregateProxy
           instance_methods.each do |m|
-            undef_method(m) unless m =~ /^__|proxy_|inspect/
+            undef_method(m) unless m =~ /^__|proxy_|original_|inspect/
           end
         end
       end
