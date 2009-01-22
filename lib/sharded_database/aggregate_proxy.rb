@@ -24,9 +24,6 @@ module ShardedDatabase
     end
 
     def method_missing(method, *args, &block)
-      if association_method?(method)
-        #apply_connection_to_association(method)
-      end
       load_target.respond_to?(method) ? load_target.send(method, *args, &block) : super
     end
 
