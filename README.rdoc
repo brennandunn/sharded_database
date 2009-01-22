@@ -20,6 +20,7 @@ Setup your Aggregate model, inheriting from a class that establishes a connectio
 
   class AggregateFoo < ActiveRecord::Base
     include ShardedDatabase::Aggregate
+    source_class 'Foo'
 
     def sharded_connection_klass
       "Connection::#{source.classify}".constantize
@@ -27,6 +28,8 @@ Setup your Aggregate model, inheriting from a class that establishes a connectio
   end
   
 The constant returned by #sharded_connection_klass is expected to be an subclass of ActiveRecord::Base and respond to #connection. It is suggested that you use the preserve_attributes class method in the aggregate class and use that attribute to augment and/or find the constant somehow.
+
+As of 0.2.0, the class method #source_class is required - sharded_database no longer guesses for the correct source class!
 
 
 === Loading Aggregate Records
@@ -50,7 +53,48 @@ Easily done. Simply add a :aggregate_proxy option set to false to your finders.
   AggreateFoo.all(:aggregate_proxy => false)
 
 
+== Working without an AggregateFoo table
 
+In the event that you need to load a Foo object directly, and you may or may not know the appropriate connection at runtime, sharded_database is able to apply itself to an ActiveRecord model directly.
+
+This is done by accepting a :connection key in the options hash for a #find method. The value of :connection can either be an abstract ActiveRecord class, a Proc, or a Symbol, which will attempt to call a method of the same name on the class doing the finding. The latter two options are also supplied the #find arguments, which is useful when wanting to dynamically determine a connection.
+
+
+=== Setup
+
+Any class that includes ShardedDatabase::Aggregate and defines a source_class will have that class be given this functionality. To add manually:
+
+  class Bar < ActiveRecord::Base
+    include ShardedDatabase::ModelWithConnection
+  end
+
+
+=== Example
+
+A real world situation would be something akin to Flickr. Data is sharded over N number of databases, and the criteria sent to your finder method would be used to connect to the right datastore.
+
+Imagine you have a photo sharing application, and due to the amount of photos managed, you're forced to shard the 'photos' database across 3 database servers. To do this with sharded_database, you'd do something like:
+
+  class Photo < ActiveRecord::Base
+  
+    def self.determine_database(*attrs)   # [:all, { :conditions => { :name => 'flower' } }]
+      case first_letter = attrs.last[:conditions][:name].first[0,1]  # get the first letter
+      when a..f   : Connection::AToF
+      when g..p   : Connection::GToP
+      when q..z   : Connection::QtoZ
+    end
+  
+  end
+  
+  Photo.all(:conditions => { :name => 'mountain' })
+
+Which would return any photo named 'mountain' against the database Connection::GToP is connected to.
+
+
+== TODO
+
+- Apply associations to objects found using the :connection key
+- Fix association application to regenerate a proper reflection/association
 
 
 Copyright &copy; 2008, Brennan Dunn, Decisiv Inc. Released under the MIT license.

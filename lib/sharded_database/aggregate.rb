@@ -7,7 +7,7 @@ module ShardedDatabase
       klass.extend         ClassMethods
       klass.send :include, InstanceMethods
       klass.class_eval do
-        cattr_accessor :source_class, :foreign_id
+        cattr_accessor :foreign_id
         @foreign_id = :other_id
 
         class << self
@@ -29,6 +29,19 @@ module ShardedDatabase
       
       def preserve_attributes(*attrs)
         @preserved_attributes = attrs.map(&:to_s)
+      end
+      
+      def source_class(klass_name)
+        @source_class = klass_name
+        apply_model_with_connection_to(klass_name)
+      end
+      
+      
+      private
+      
+      def apply_model_with_connection_to(klass_name)
+        require_dependency klass_name.underscore unless defined?(klass_name.constantize)  # ensure that the source class has been loaded
+        klass_name.constantize.send :include, ShardedDatabase::ModelWithConnection
       end
 
     end
@@ -65,7 +78,7 @@ module ShardedDatabase
       def apply_proxy
         class << self
           alias_method :proxy_class, :class
-
+          
           include AggregateProxy
           instance_methods.each do |m|
             undef_method(m) unless m =~ /^__|proxy_|original_|inspect/
