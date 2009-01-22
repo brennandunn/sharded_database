@@ -69,6 +69,21 @@ Any class that includes ShardedDatabase::Aggregate and defines a source_class wi
   end
 
 
+=== Usage
+
+As mentioned above, there are three acceptable values for the :connection key. Borrowing heavily from ActionController's callback setup, acceptable values can either be an ActiveRecord class, or a Proc or class method name (represented as a symbol) that will ultimately return an ActiveRecord class. Both the Proc and method will be passed a splat of the attributes passed to #find.
+
+The method implementation will be demonstrated in the Example, but the other implementations are as follows: 
+
+<b>Supplying a class</b>
+  Bar.find(:first, :order => 'created_at asc', :connection => BarConnection)
+
+<b>Supplying a Proc</b>
+  Bar.find(123, :connection => lambda { |*args| (args.first % 2) == 1 ? Connection::One : Connection::Two })
+
+...Which would use Connection::One, as % 2 of 123 is 1.
+
+
 === Example
 
 A real world situation would be something akin to Flickr. Data is sharded over N number of databases, and the criteria sent to your finder method would be used to connect to the right datastore.
