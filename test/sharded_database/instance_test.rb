@@ -34,6 +34,10 @@ class InstanceTest < ShardedDatabase::TestCase
       assert_equal 'one', @employee.proxy_source
     end
     
+    should 'have #respond_to? proxy to the instance' do
+      assert @employee.respond_to?(:call_company)
+    end
+
   end
   
 end

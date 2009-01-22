@@ -9,6 +9,10 @@ module ShardedDatabase
       load_target.inspect.gsub(/#<([\w\:]+)\s(.*?)>/) { "#<#{$1}(#{@klass.name}) #{$2}>" }
     end
 
+    def respond_to?(method)
+      load_target.respond_to?(method) || super
+    end
+
 
     private
 
