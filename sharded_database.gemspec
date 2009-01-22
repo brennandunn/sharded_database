@@ -15,7 +15,8 @@ Gem::Specification.new do |s|
     "lib/sharded_database.rb",
     "lib/sharded_database/aggregate.rb",
     "lib/sharded_database/aggregate_proxy.rb",
-    "lib/sharded_database/core_extensions.rb" ]
+    "lib/sharded_database/core_extensions.rb", 
+    "lib/sharded_database/model_with_connection.rb" ]
   s.test_files = [
     "test/helper.rb",
     "test/sharded_database/association_test.rb",
