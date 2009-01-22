@@ -77,7 +77,7 @@ Imagine you have a photo sharing application, and due to the amount of photos ma
 
   class Photo < ActiveRecord::Base
   
-    def self.determine_database(*attrs)   # [:all, { :conditions => { :name => 'flower' } }]
+    def self.determine_database(*attrs)   # [:all, { :conditions => { :name => 'mountain' } }]
       case first_letter = attrs.last[:conditions][:name].first[0,1]  # get the first letter
       when a..f   : Connection::AToF
       when g..p   : Connection::GToP
