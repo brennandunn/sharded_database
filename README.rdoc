@@ -86,7 +86,7 @@ Imagine you have a photo sharing application, and due to the amount of photos ma
   
   end
   
-  Photo.all(:conditions => { :name => 'mountain' })
+  Photo.all(:conditions => { :name => 'mountain' }, :connection => :determine_database)
 
 Which would return any photo named 'mountain' against the database Connection::GToP is connected to.
 
