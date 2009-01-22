@@ -46,11 +46,23 @@ module ShardedDatabase
         @foreign_id = self[self.class.foreign_id.to_sym]
 
         metaclass.delegate :connection, :to => @klass
-
+        
+        preserve_attributes
+        apply_proxy
+        channel_associations_to_proper_connection
+        
+      end
+      
+      
+      private
+      
+      def preserve_attributes
         (self.class.instance_variable_get("@preserved_attributes") || []).each do |attr|
           metaclass.send :alias_method, "proxy_#{attr}", attr
         end
-
+      end
+      
+      def apply_proxy
         class << self
           alias_method :proxy_class, :class
 
@@ -59,7 +71,9 @@ module ShardedDatabase
             undef_method(m) unless m =~ /^__|proxy_|inspect/
           end
         end
-
+      end
+      
+      def channel_associations_to_proper_connection
         self.class.reflect_on_all_associations.each do |a| 
           metaclass.send :alias_method, "proxy_#{a.name}".to_sym, a.name.to_sym
           metaclass.send :undef_method, a.name
@@ -87,7 +101,6 @@ module ShardedDatabase
             end
           }, __FILE__, __LINE__
         end
-        
       end
       
     end

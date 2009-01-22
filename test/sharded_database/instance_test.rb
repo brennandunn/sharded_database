@@ -21,7 +21,7 @@ class InstanceTest < ShardedDatabase::TestCase
     setup do
       @employee = AggregateEmployee.first
     end
-
+    
     should 'channel calls to #class to the proxy class' do
       assert @employee.is_a?(Employee)
     end
