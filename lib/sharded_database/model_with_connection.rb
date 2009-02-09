@@ -12,9 +12,12 @@ module ShardedDatabase
     end
     
     def self.borrow_connection(requesting_class, target_class, &block)
-      eigen = requesting_class.metaclass
-      eigen.delegate :connection, :to => target_class
+      @eigen = requesting_class.metaclass
+      @eigen.send :alias_method, :proxy_connection, :connection
+      @eigen.delegate :connection, :to => target_class
       yield(requesting_class)
+    ensure
+      @eigen.send :alias_method, :connection, :proxy_connection
     end
     
     

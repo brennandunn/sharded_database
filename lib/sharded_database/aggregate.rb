@@ -57,13 +57,10 @@ module ShardedDatabase
         @klass      = sharded_connection_klass
         @connection = @klass.respond_to?(:connection) ? @klass.connection : raise(ShardedDatabase::NoConnectionError, 'Connection class does not respond to :connection')
         @foreign_id = self[self.class.foreign_id.to_sym]
-
-        metaclass.delegate :connection, :to => @klass
         
         preserve_attributes
         apply_proxy
         channel_associations_to_proper_connection
-        
       end
       
       
