@@ -39,7 +39,7 @@ class Item < ActiveRecord::Base
 end
 
 class AggregateEmployee < GlobalConnection
-  belongs_to :gun
+  belongs_to :company
   include ShardedDatabase::Aggregate
   self.foreign_id   = :other_id
   source_class 'Employee'

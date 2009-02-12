@@ -9,18 +9,14 @@ class AssociationTest < ShardedDatabase::TestCase
   
   context 'Connection delegation on has_many associations' do
     
-    should 'fetch items from the parent instance connection' do
-      assert ! @parent.items.empty?
-      assert_connection :shard_one, @parent.items.first
-    end
-    
-    should 'keep its connection when bubbling up to an associations parent' do
-      assert_equal @parent, @parent.items.first.employee
+    should_eventually 'fetch items from the parent instance connection' do
+      assert_instance_of Array, @parent.items
+      assert_equal '', @parent.items
     end
     
   end
   
-  context '[UNFINISHED] Connection delegation on belongs_to associations' do
+  context 'Connection delegation on belongs_to associations' do
     
     should 'fetch the associated company for an employee from the respective connection' do
       assert_instance_of Company, @parent.company

@@ -29,7 +29,7 @@ module ShardedDatabase
           case connection_arg
           when Symbol then send(connection_arg, *args)
           when Proc then connection_arg.call(*args)
-          else connection_arg
+          when Class then connection_arg
           end
           ModelWithConnection.borrow_connection(self, connection) { find_without_connection(*args) }
         else

@@ -82,34 +82,25 @@ module ShardedDatabase
           end
         end
       end
-      
+
       def channel_associations_to_proper_connection
-        self.class.reflect_on_all_associations.each do |a| 
-          metaclass.send :alias_method, "proxy_#{a.name}".to_sym, a.name.to_sym
-          metaclass.send :undef_method, a.name
-          
-          load_target.metaclass.send(:attr_accessor, :source_class)
-          load_target.source_class = @klass
-          method = a.name
-          load_target.class_eval %{
-            def #{method}(*args)
-              return @#{method} if @#{method}
-          
-              if proxy_#{method}.respond_to?(:proxy_reflection)
-                proxy_#{method}.proxy_reflection.klass.metaclass.delegate :connection, :to => self.source_class
-                proxy_#{method}
-              else
-                # Hacked implementation of belongs_to to superficially simulate an association proxy
-                # Revisit this later and do it properly.
-          
-                reflection = self.class.reflect_on_all_associations.find { |a| a.name == :#{method} }
-                klass = reflection.klass            
-                klass.metaclass.delegate :connection, :to => self.source_class
-                @#{method} ||= klass.find(send(reflection.primary_key_name))            
-                @#{method}
+        self.class.reflect_on_all_associations.each do |association|
+          metaclass.class_eval %{
+            
+            def #{association.name}_with_connection(*args)
+              reflection = self.class.reflect_on_association(:#{association.name})
+              klass = reflection.klass
+              ModelWithConnection.borrow_connection(klass, #{@klass.name}) do
+                unless reflection.belongs_to?
+                  # TODO
+                  klass.send :include, ShardedDatabase::ModelWithConnection
+                end
+                #{association.name}_without_connection(*args)
               end
             end
+            
           }, __FILE__, __LINE__
+          metaclass.send :alias_method_chain, association.name, :connection
         end
       end
       

@@ -34,9 +34,8 @@ module ShardedDatabase
       end
       
       # Setup sharded DBs for employees
-      %w(one two).each do |num|
-        ::ActiveRecord::Base.establish_connection "shard_#{num}".to_sym
-        ::ActiveRecord::Base.class_eval do
+      [Connection::One, Connection::Two].each do |klass|
+        klass.class_eval do
           silence do
             connection.create_table :employees, :force => true do |t|
               t.belongs_to  :company

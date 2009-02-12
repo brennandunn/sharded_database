@@ -5,7 +5,7 @@ require 'active_record'
 require 'active_support'
 require 'fileutils'
 require 'shoulda'
-require 'quietbacktrace'
+#require 'quietbacktrace'
 
 ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__)+'/../debug.log')
 ActiveRecord::Base.configurations = $config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))

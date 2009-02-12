@@ -19,10 +19,17 @@ class ConnectionTest < ShardedDatabase::TestCase
     assert_match %{(Connection::One)}, AggregateEmployee.find_by_source('one').inspect
   end
   
-  should 'return original connection when complete' do
+  should 'return original connection after accessing just the target model' do
     original = Employee.connection.instance_variable_get('@config')[:database]
     AggregateEmployee.find_by_source('one')
     final = Employee.connection.instance_variable_get('@config')[:database]
+    assert_equal original, final
+  end
+  
+  should 'return original connection after accessing an association' do
+    original = Company.connection.instance_variable_get('@config')[:database]
+    AggregateEmployee.find_by_source('one').company
+    final = Company.connection.instance_variable_get('@config')[:database]
     assert_equal original, final
   end
   
