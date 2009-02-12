@@ -34,3 +34,4 @@ module ShardedDatabase
 end
 
 ActiveRecord::Associations::HasManyAssociation.send :include, ShardedDatabase::HasManyAssociation
+ActiveRecord::Associations::HasManyThroughAssociation.send :include, ShardedDatabase::HasManyAssociation
