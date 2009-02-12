@@ -15,9 +15,9 @@ module ShardedDatabase
       @eigen = requesting_class.metaclass
       @eigen.send :alias_method, :proxy_connection, :connection
       @eigen.delegate :connection, :to => target_class
-      yield(requesting_class)
+      block_given? ? yield(requesting_class) : requesting_class
     ensure
-      @eigen.send :alias_method, :connection, :proxy_connection
+      @eigen.send :alias_method, :connection, :proxy_connection if block_given?
     end
     
     

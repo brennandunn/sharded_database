@@ -89,12 +89,9 @@ module ShardedDatabase
             
             def #{association.name}_with_connection(*args)
               reflection = self.class.reflect_on_association(:#{association.name})
+              reflection.options.merge!({ :connection_class => #{@klass.name}} )
               klass = reflection.klass
               ModelWithConnection.borrow_connection(klass, #{@klass.name}) do
-                unless reflection.belongs_to?
-                  # TODO
-                  klass.send :include, ShardedDatabase::ModelWithConnection
-                end
                 #{association.name}_without_connection(*args)
               end
             end

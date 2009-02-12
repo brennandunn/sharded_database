@@ -10,8 +10,6 @@ class ConnectionTest < ShardedDatabase::TestCase
   
   should 'have instances of the same source share the same connection' do
     first, second = AggregateEmployee.find_all_by_source('two', :limit => 2)
-    
-    #assert_connection :shard_two, first, second
     assert_equal first.connection.object_id, second.connection.object_id  # ensure that delegation is working correctly
   end
   
@@ -20,16 +18,9 @@ class ConnectionTest < ShardedDatabase::TestCase
   end
   
   should 'return original connection after accessing just the target model' do
-    original = Employee.connection.instance_variable_get('@config')[:database]
+    original = Employee.connection
     AggregateEmployee.find_by_source('one')
-    final = Employee.connection.instance_variable_get('@config')[:database]
-    assert_equal original, final
-  end
-  
-  should 'return original connection after accessing an association' do
-    original = Company.connection.instance_variable_get('@config')[:database]
-    AggregateEmployee.find_by_source('one').company
-    final = Company.connection.instance_variable_get('@config')[:database]
+    final = Employee.connection
     assert_equal original, final
   end
   
@@ -37,18 +28,10 @@ class ConnectionTest < ShardedDatabase::TestCase
     
     should 'allow for an ActiveRecord::Base class to be supplied' do
       object = Employee.first(:connection => Connection::One)
-      #assert_connection :shard_one, object      
     end
     
     should 'allow for a Proc object to be supplied' do
       proc = lambda { |*args| (args.first % 2) == 1 ? Connection::One : Connection::Two }
-      
-      #assert_connection :shard_one, Employee.find(1, :connection => proc)
-      #assert_connection :shard_two, Employee.find(2, :connection => proc)
-    end
-    
-    should 'allow for a symbol to be supplied (which calls a method)' do
-      #assert_connection :shard_one, Employee.find(1, :connection => :pick_connection)
     end
     
   end
