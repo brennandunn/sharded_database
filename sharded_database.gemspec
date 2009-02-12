@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name     = "sharded_database"
-  s.version  = "0.3.1"
-  s.date     = "2009-01-21"
+  s.version  = "0.3.2"
+  s.date     = "2009-02-12"
   s.summary  = "Allows for connection handling at the instance level."
   s.email    = "me@brennandunn.com"
   s.homepage = "http://github.com/brennandunn/sharded_database/"
@@ -16,7 +16,8 @@ Gem::Specification.new do |s|
     "lib/sharded_database/aggregate.rb",
     "lib/sharded_database/aggregate_proxy.rb",
     "lib/sharded_database/core_extensions.rb", 
-    "lib/sharded_database/model_with_connection.rb" ]
+    "lib/sharded_database/model_with_connection.rb", 
+    "lib/sharded_database/has_many_association.rb" ]
   s.test_files = [
     "test/helper.rb",
     "test/sharded_database/association_test.rb",
