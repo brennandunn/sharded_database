@@ -20,6 +20,21 @@ class AssociationTest < ShardedDatabase::TestCase
       end
     end
     
+    should 'be able to add objects to a collection association' do
+      item = @parent.items.create :name => 'Test create'
+      assert @parent.items(true).include?(item)
+    end
+
+    should 'be able to delete objects in a collection association' do
+      @parent.items.first.destroy
+      assert @parent.items(true).empty?
+    end
+
+    should 'be able to read/write item ids' do
+      ids = @parent.items.map(&:id)
+      assert_equal ids, @parent.item_ids
+    end
+
   end
   
   context 'Connection delegation on belongs_to associations' do
