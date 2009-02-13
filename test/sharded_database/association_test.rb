@@ -15,10 +15,9 @@ class AssociationTest < ShardedDatabase::TestCase
     end
     
     should 'return original connection after accessing a has_many association' do
-      original = Item.connection
-      AggregateEmployee.find_by_source('one').items
-      final = Item.connection
-      assert_equal original, final
+      assert_releases_connection(Item) do
+        AggregateEmployee.find_by_source('one').items
+      end
     end
     
   end
@@ -38,10 +37,9 @@ class AssociationTest < ShardedDatabase::TestCase
     end
     
     should 'return original connection after accessing a belongs_to association' do
-      original = Company.connection
-      AggregateEmployee.find_by_source('one').company
-      final = Company.connection
-      assert_equal original, final
+      assert_releases_connection(Company) do
+        AggregateEmployee.find_by_source('one').company
+      end
     end
     
   end

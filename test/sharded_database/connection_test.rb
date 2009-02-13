@@ -18,10 +18,9 @@ class ConnectionTest < ShardedDatabase::TestCase
   end
   
   should 'return original connection after accessing just the target model' do
-    original = Employee.connection
-    AggregateEmployee.find_by_source('one')
-    final = Employee.connection
-    assert_equal original, final
+    assert_releases_connection(Employee) do
+      AggregateEmployee.find_by_source('one')
+    end
   end
   
   context 'loading records when given a :connection key in the options hash' do

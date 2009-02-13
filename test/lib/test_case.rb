@@ -7,7 +7,6 @@ module ShardedDatabase
     end
     
     def breakdown_environment
-
     end
     
     def test_truth ; end
